@@ -2,6 +2,18 @@
 
 This repository consists of all the important requirements to set up a kafka integrated with Apache Ranger, it is based on https://github.com/apache/ranger/tree/master/dev-support/ranger-docker
 
+## Quick start (all services)
+
+To start every service and automatically verify that all containers are up and healthy, run the convenience script:
+
+~~~
+chmod +x start-all.sh && ./start-all.sh
+~~~
+
+The script exports the required environment variables, starts every docker-compose service in detached mode, and exits with a non-zero status code if any container fails to start (printing which containers are in a bad state).
+
+---
+
 ## Steps to set up the demo system:
 
 1. Run the following:
