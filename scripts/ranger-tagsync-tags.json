@@ -1,0 +1,13 @@
+{
+  "op":          "add_or_update",
+  "serviceName": "dev_kafka",
+  "tagVersion":  0,
+  "tagDefinitions": {
+    "0": { "name": "PII" }
+  },
+  "tags": {
+    "0": { "type": "PII" }
+  },
+  "serviceResources": [],
+  "resourceToTagIds": {}
+}

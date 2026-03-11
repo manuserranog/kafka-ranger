@@ -15,6 +15,7 @@ services:
     networks:
       - ranger
     ports:
+      - "9092:9092"
       - "6667:6667"
     depends_on:
       ranger:
@@ -25,15 +26,10 @@ services:
       - KAFKA_VERSION
       - RANGER_VERSION
     volumes:
-      - ./server.properties:/opt/kafka_2.12-2.5.0/config/server.properties
       - ./server.properties:/opt/kafka/config/server.properties
-      - ./client.properties:/opt/kafka_2.12-2.5.0/config/client.properties
       - ./client.properties:/opt/kafka/config/client.properties
-      - ./kafka-authentication/keystore:/opt/kafka_2.12-2.5.0/config/keystore
       - ./kafka-authentication/keystore:/opt/kafka/config/keystore
-      - ./kafka-authentication/truststore:/opt/kafka_2.12-2.5.0/config/truststore
       - ./kafka-authentication/truststore:/opt/kafka/config/truststore
-      - ./kafka-authentication/kafka_server_jaas.conf:/opt/kafka_2.12-2.5.0/config/kafka_server_jaas.conf
       - ./kafka-authentication/kafka_server_jaas.conf:/opt/kafka/config/kafka_server_jaas.conf
       - ./scripts/ranger-kafka-plugin-install.properties:/opt/ranger/ranger-kafka-plugin/install.properties
       - ./scripts/ranger-kafka-plugin-install.properties:/opt/ranger/ranger-3.0.0-SNAPSHOT-kafka-plugin/install.properties
