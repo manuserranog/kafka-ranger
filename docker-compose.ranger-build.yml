@@ -10,7 +10,7 @@ services:
     networks:
       - ranger
     volumes:
-      - ${HOME:-~}/.m2:/home/ranger/.m2:delegated
+      - ranger-m2:/home/ranger/.m2:delegated
       - ./scripts:/home/ranger/scripts
       - ./patches:/home/ranger/patches
       - ./dist:/home/ranger/dist:delegated
@@ -20,6 +20,7 @@ services:
     environment:
       - BRANCH
       - BUILD_HOST_SRC
+      - BUILD_OPTS
       - PROFILE
       - GIT_URL
       - RANGER_VERSION
@@ -28,3 +29,6 @@ services:
 networks:
   ranger:
     name: rangernw
+
+volumes:
+  ranger-m2:

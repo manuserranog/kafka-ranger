@@ -13,6 +13,24 @@ COMPOSE_FILES=(
 )
 
 ###############################################################################
+# 0. Pre-flight: dist/ must contain Ranger artifacts.
+#    If missing, run the build container first:
+#      docker compose -f docker compose.ranger-base.yml \
+#                     -f docker compose.ranger-build.yml up
+#    (This clones Apache Ranger from GitHub and compiles it — may take ~45 min)
+###############################################################################
+if [ ! -f dist/version ]; then
+  echo "ERROR: dist/version not found. Ranger artifacts have not been built yet."
+  echo ""
+  echo "  Run the build container first:"
+  echo "    docker compose -f docker-compose.ranger-base.yml \\"
+  echo "                   -f docker-compose.ranger-build.yml up"
+  echo ""
+  echo "  Then re-run this script once the build completes."
+  exit 1
+fi
+
+###############################################################################
 # 1. Export required environment variables
 ###############################################################################
 export DOCKER_BUILDKIT=1
@@ -32,7 +50,7 @@ fi
 # 2. Start all services in detached mode
 ###############################################################################
 echo "==> Starting all Kafka-Ranger services..."
-docker-compose "${COMPOSE_FILES[@]}" up -d
+docker compose "${COMPOSE_FILES[@]}" up -d
 
 ###############################################################################
 # 3. Verify that every container is running (not exited / restarting)
@@ -45,14 +63,14 @@ TIMEOUT=${HEALTH_TIMEOUT:-30}   # seconds to wait for containers to stabilise
 INTERVAL=3                       # poll every N seconds
 
 # Collect the names of every service defined in the compose files
-mapfile -t SERVICE_NAMES < <(docker-compose "${COMPOSE_FILES[@]}" ps --services 2>/dev/null)
+mapfile -t SERVICE_NAMES < <(docker compose "${COMPOSE_FILES[@]}" ps --services 2>/dev/null)
 
 check_containers() {
   local failed=0
   for svc in "${SERVICE_NAMES[@]}"; do
     # Resolve the actual container name from the compose project
     local container_id
-    container_id=$(docker-compose "${COMPOSE_FILES[@]}" ps -q "$svc" 2>/dev/null | head -n1)
+    container_id=$(docker compose "${COMPOSE_FILES[@]}" ps -q "$svc" 2>/dev/null | head -n1)
 
     if [[ -z "$container_id" ]]; then
       echo "  [ERROR] $svc  (container not found)"
@@ -101,9 +119,9 @@ done
 echo ""
 if [ "$ERRORS" -gt 0 ]; then
   echo "==> $ERRORS container(s) failed to start. Inspect individual service logs with:"
-  echo "    docker-compose -f docker-compose.ranger-base.yml -f docker-compose.ranger.yml \\"
-  echo "      -f docker-compose.ranger-postgres.yml -f docker-compose.ranger-usersync.yml \\"
-  echo "      -f docker-compose.ranger-tagsync.yml -f docker-compose.ranger-kafka.yml \\"
+  echo "    docker compose -f docker compose.ranger-base.yml -f docker compose.ranger.yml \\"
+  echo "      -f docker compose.ranger-postgres.yml -f docker compose.ranger-usersync.yml \\"
+  echo "      -f docker compose.ranger-tagsync.yml -f docker compose.ranger-kafka.yml \\"
   echo "      logs --tail=50 <service>"
   exit 1
 else
