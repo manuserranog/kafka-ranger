@@ -27,7 +27,7 @@ services:
     command:
       - /home/ranger/scripts/ranger.sh
     volumes:
-      - ./scripts/ranger-admin-install-postgres.properties:/opt/ranger/ranger-3.0.0-SNAPSHOT-admin/install.properties
+      - ./scripts/ranger-admin-install-postgres.properties:/opt/ranger/ranger-${RANGER_VERSION}-admin/install.properties
       - ./scripts/ranger-admin-install-postgres.properties:/opt/ranger/admin/install.properties
 
   ranger-zk:
@@ -53,10 +53,7 @@ services:
       - ranger
     ports:
       - "8983:8983"
-    command:
-      - solr-precreate
-      - ranger_audits
-      - /opt/solr/server/solr/configsets/ranger_audits/
+    command: ["solr-precreate", "ranger_audits", "/opt/solr/server/solr/configsets/ranger_audits/"]
 
   # elasticsearch:
   #   image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1

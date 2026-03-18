@@ -1,0 +1,22 @@
+# Build artifacts - large binaries, do not commit to git
+dist/*.tar.gz
+dist/*.jar
+dist/*.zip
+dist/version
+
+# Downloaded third-party archives and JARs
+downloads/*.tgz
+downloads/*.tar.gz
+downloads/*.jar
+downloads/*.zip
+
+# SSL key material (private keys, keystores)
+kafka-authentication/keystore/*.jks
+kafka-authentication/keystore/*.p12
+kafka-authentication/truststore/*.jks
+kafka-authentication/truststore/*.p12
+kafka-authentication/truststore/ca-key
+kafka-authentication/truststore/ca-cert
+
+# AI tools project data
+.claude/
