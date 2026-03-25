@@ -29,6 +29,9 @@ services:
     volumes:
       - ./scripts/ranger-admin-install-postgres.properties:/opt/ranger/ranger-${RANGER_VERSION}-admin/install.properties
       - ./scripts/ranger-admin-install-postgres.properties:/opt/ranger/admin/install.properties
+      # Volume-mount so create-ranger-services.py changes take effect without
+      # rebuilding the Ranger image (the script runs only on first setup).
+      - ./scripts/create-ranger-services.py:/home/ranger/scripts/create-ranger-services.py
 
   ranger-zk:
     build:

@@ -10,6 +10,7 @@ COMPOSE_FILES=(
   -f docker-compose.ranger-usersync.yml
   -f docker-compose.ranger-tagsync.yml
   -f docker-compose.ranger-kafka.yml
+  -f docker-compose.ranger-schema-registry.yml
 )
 
 ###############################################################################

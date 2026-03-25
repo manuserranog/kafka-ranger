@@ -1,0 +1,56 @@
+version: '3'
+services:
+  # Confluent Schema Registry connected to the Ranger-protected Kafka broker.
+  # Authorization at the Schema Registry REST API level is managed via the
+  # 'schema-registry' service type in Ranger Admin (dev_schema_registry).
+  # The ranger-schema-registry-init sidecar waits for both Ranger and Schema
+  # Registry to be healthy, then registers (or verifies) the Ranger service.
+  ranger-schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    container_name: ranger-schema-registry
+    hostname: ranger-schema-registry.example.com
+    stdin_open: true
+    tty: true
+    networks:
+      - ranger
+    ports:
+      - "8081:8081"
+    depends_on:
+      ranger-kafka:
+        condition: service_started
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: ranger-schema-registry.example.com
+      # Kafka uses SASL_PLAINTEXT; 'admin' is a Kafka super-user (bypasses Ranger)
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "ranger-kafka.example.com:6667"
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_PLAINTEXT
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: >-
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="admin"
+        password="admin-secret";
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+      SCHEMA_REGISTRY_DEBUG: "true"
+
+  # One-shot init container: waits for Ranger Admin + Schema Registry, then
+  # creates the 'dev_schema_registry' service in Ranger (idempotent).
+  ranger-schema-registry-init:
+    image: python:3.11-slim
+    container_name: ranger-schema-registry-init
+    networks:
+      - ranger
+    volumes:
+      - ./scripts/ranger-schema-registry-register.py:/tmp/ranger-schema-registry-register.py:ro
+    command: >
+      /bin/bash -c "pip install apache-ranger requests --quiet &&
+                    python3 /tmp/ranger-schema-registry-register.py"
+    depends_on:
+      ranger:
+        condition: service_started
+      ranger-schema-registry:
+        condition: service_started
+
+networks:
+  ranger:
+    name: rangernw

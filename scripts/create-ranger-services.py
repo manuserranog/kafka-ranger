@@ -126,7 +126,16 @@ solr = RangerService({'name': 'dev_solr', 'type': 'solr',
                                  'ranger.plugin.super.users': 'solr',
                                  'ranger.plugin.solr.policy.refresh.synchronous':'true'}})
 
-services = [kafka]
+schema_registry = RangerService({'name': 'dev_schema_registry', 'type': 'schema-registry',
+                                  'configs': {'username': 'admin', 'password': 'rangerR0cks!',
+                                              'schema.registry.url': 'http://ranger-schema-registry.example.com:8081',
+                                              'schema-registry.authentication': 'simple',
+                                              'policy.download.auth.users': 'schema-registry',
+                                              'tag.download.auth.users': 'schema-registry',
+                                              'userstore.download.auth.users': 'schema-registry',
+                                              'ranger.plugin.schema-registry.policy.refresh.synchronous': 'true'}})
+
+services = [kafka, schema_registry]
 for service in services:
     try:
         if service_not_exists(service):
